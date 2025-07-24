@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Total Bond Calculator</title>
+    <style>
+    body { font-family: Arial, sans-serif; background: #f8f8f8; }
+    .container { max-width: 400px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px #ccc; }
+    h2 { text-align: center; }
+    label { display: block; margin-top: 12px; }
+    input[type="number"] { 
+        width: 100%; 
+        padding: 8px; 
+        margin-top: 4px; 
+        box-sizing: border-box; 
+        appearance: textfield;           /* Standard property */
+        -webkit-appearance: none;        /* Chrome, Safari, Edge */
+        -moz-appearance: textfield;      /* Firefox */
+    }
+    button { margin-top: 20px; width: 100%; padding: 10px; background: #3498db; color: #fff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+    .result { margin-top: 24px; padding: 12px; background: #eaf6ff; border-radius: 4px; text-align: center; }
+
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+    <h2>Total Bond Calculator</h2>
+    <form id="bondForm">
+        <div style="display:flex; gap:32px;">
+            <!-- Inputs Column -->
+            <div style="flex:1;">
+                <label for="max_ap">
+                    Max AP:
+                    <span style="cursor:pointer; position:relative;">
+                        <span 
+                            style="
+                                display:inline-block;
+                                width:16px;
+                                height:16px;
+                                border-radius:50%;
+                                background:#3498db;
+                                color:#fff;
+                                text-align:center;
+                                font-size:13px;
+                                font-weight:bold;
+                                line-height:16px;
+                                margin-left:4px;
+                            "
+                            title="Max AP is your maximum Action Points (energy). It is found directly under your level bar in the game (e.g 140/140)"
+                        >i</span>
+                    </span>
+                </label>
+                <input type="number" id="max_ap" required min="1" value="1">
+
+                <label for="saint_quartz">Saint Quartz:</label>
+                <input type="number" id="saint_quartz" required min="0" value="0">
+
+                <label for="gold_apple">Gold Apples:</label>
+                <input type="number" id="gold_apple" required min="0" value="0">
+
+                <label for="silver_apple">Silver Apples:</label>
+                <input type="number" id="silver_apple" required min="0" value="0">
+
+                <label for="blue_apple">Blue Apples:</label>
+                <input type="number" id="blue_apple" required min="0" value="0">
+
+                <label for="bronze_apple">Bronze Apples:</label>
+                <input type="number" id="bronze_apple" required min="0" value="0">
+
+                <label for="stage_bond">
+                    Bond Points per Run:
+                    <span style="cursor:pointer; position:relative;">
+                        <span 
+                            style="
+                                display:inline-block;
+                                width:16px;
+                                height:16px;
+                                border-radius:50%;
+                                background:#3498db;
+                                color:#fff;
+                                text-align:center;
+                                font-size:13px;
+                                font-weight:bold;
+                                line-height:16px;
+                                margin-left:4px;
+                            "
+                            title="Bond Points per Run is the total bond points you get per quest clear, excluding bonuses."
+                        >i</span>
+                    </span>
+                </label>
+                <input type="number" id="stage_bond" required min="0" value="0">
+
+                <label for="cost">Node AP Cost:</label>
+                <input type="number" id="cost" required min="1" value="1">
+            </div>
+            <!-- Checkboxes Column -->
+            <div style="flex:0 0 220px; margin-top:8px;">
+                <label><input type="checkbox" id="teatime_support"> Chaldea Teatime (Support)</label><br>
+                <label><input type="checkbox" id="teatime_own"> Chaldea Teatime (Own)</label><br>
+                <label><input type="checkbox" id="lunchtime_support"> Chaldea Lunchtime (Support)</label><br>
+                <label><input type="checkbox" id="lunchtime_own"> Chaldea Lunchtime (Own)</label><br>
+                <label><input type="checkbox" id="bond_ce"> 5% Bond CE</label><br>
+                <label><input type="checkbox" id="support_front"> Frontline Support (4%)</label>
+                <div id="bondBonusText" style="margin-top:24px; font-weight:bold; font-size:1.4em; text-align:center;"></div>
+                <div style="margin-top:32px; text-align:center;">
+                    <button type="button" id="toggleMode" style="padding:8px 24px; border-radius:6px; border:none; background:#eee; color:#222; font-size:1em; cursor:pointer;">
+                        🌙 Dark Mode
+                    </button>
+                </div>
+            </div>
+        </div>
+        <button type="submit">Calculate</button>
+    </form>
+    <div class="result" id="result" style="display:none;"></div>
+</div>
+<script>
+    // Support checkbox logic
+    document.getElementById('teatime_support').addEventListener('change', function() {
+        document.getElementById('lunchtime_support').disabled = this.checked;
+        updateBondBonus();
+    });
+    document.getElementById('lunchtime_support').addEventListener('change', function() {
+        document.getElementById('teatime_support').disabled = this.checked;
+        updateBondBonus();
+    });
+    document.getElementById('teatime_own').addEventListener('change', updateBondBonus);
+    document.getElementById('lunchtime_own').addEventListener('change', updateBondBonus);
+    document.getElementById('bond_ce').addEventListener('change', updateBondBonus);
+    document.getElementById('support_front').addEventListener('change', updateBondBonus);
+
+    function updateBondBonus() {
+        const values = [15, 5, 10, 10, 5, 4];
+        const ids = [
+            'teatime_support',
+            'teatime_own',
+            'lunchtime_support',
+            'lunchtime_own',
+            'bond_ce',
+            'support_front'
+        ];
+        let total = 0;
+        ids.forEach((id, i) => {
+            if (document.getElementById(id).checked) {
+                total += values[i];
+            }
+        });
+        const textDiv = document.getElementById('bondBonusText');
+        if (total === 0) {
+            textDiv.style.color = 'red';
+            textDiv.textContent = 'No Bonus Bond';
+        } else {
+            textDiv.style.color = 'green';
+            textDiv.textContent = `${total}% Bond Bonus`;
+        }
+    }
+    updateBondBonus();
+
+    document.getElementById('bondForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const max_ap = Number(document.getElementById('max_ap').value);
+        const sq = Number(document.getElementById('saint_quartz').value);
+        const gold_apple = Number(document.getElementById('gold_apple').value);
+        const silver_apple = Number(document.getElementById('silver_apple').value);
+        const blue_apple = Number(document.getElementById('blue_apple').value);
+        const bronze_apple = Number(document.getElementById('bronze_apple').value);
+        const stage_bond = Number(document.getElementById('stage_bond').value);
+        const cost = Number(document.getElementById('cost').value);
+
+        const values = [15, 5, 10, 10, 5, 4];
+        const ids = [
+            'teatime_support',
+            'teatime_own',
+            'lunchtime_support',
+            'lunchtime_own',
+            'bond_ce',
+            'support_front'
+        ];
+        let totalBonus = 0;
+        ids.forEach((id, i) => {
+            if (document.getElementById(id).checked) {
+                totalBonus += values[i];
+            }
+        });
+        const bonusMultiplier = 1 + (totalBonus / 100);
+
+        const gapple_ap_total = max_ap * gold_apple;
+        const sq_ap_total = max_ap * sq;
+        const sapple_ap_total = (max_ap * 0.5) * silver_apple;
+        const blapple_ap_total = 40 * blue_apple;
+        const brapple_ap_total = 10 * bronze_apple;
+        const total_ap = gapple_ap_total + sq_ap_total + sapple_ap_total + blapple_ap_total + brapple_ap_total;
+        const total_runs = Math.floor(total_ap / cost);
+        const total_bond = Math.floor(total_runs * stage_bond * bonusMultiplier);
+
+        document.getElementById('result').style.display = 'block';
+        const frontline_bond = Math.floor(total_bond * 1.2);
+        document.getElementById('result').innerHTML =
+            `<strong>Total Runs:</strong> ${total_runs}<br>
+            <strong>Total Bond Obtained:</strong> ${total_bond}<br>
+            <strong>Total Bond for Frontline Servants:</strong> ${frontline_bond}`;
+    });
+
+    // Light/Dark mode toggle
+    const toggleBtn = document.getElementById('toggleMode');
+    let darkMode = false;
+    toggleBtn.addEventListener('click', function() {
+        darkMode = !darkMode;
+        const container = document.querySelector('.container');
+        const resultBox = document.getElementById('result');
+        if (darkMode) {
+            document.body.style.background = "#222";
+            container.style.background = "#2c2c2c";
+            container.style.color = "#eee";
+            resultBox.style.background = "#333";
+            resultBox.style.color = "#fff";
+            toggleBtn.textContent = "☀️ Light Mode";
+            toggleBtn.style.background = "#444";
+            toggleBtn.style.color = "#eee";
+        } else {
+            document.body.style.background = "#f8f8f8";
+            container.style.background = "#fff";
+            container.style.color = "#222";
+            resultBox.style.background = "#eaf6ff";
+            resultBox.style.color = "#222";
+            toggleBtn.textContent = "🌙 Dark Mode";
+            toggleBtn.style.background = "#eee";
+            toggleBtn.style.color = "#222";
+        }
+    });
+</script>
+</body>
+</html>
