@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Total Bond Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-    body { font-family: Arial, sans-serif; background: #f8f8f8; }
-    .container { max-width: 400px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px #ccc; }
+    body { font-family: Arial, sans-serif; background: #f8f8f8; margin:0; }
+    .container { max-width: 500px; margin: 24px auto; background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 2px 8px #ccc; }
     h2 { text-align: center; }
     label { display: block; margin-top: 12px; }
     input[type="number"] { 
@@ -13,17 +14,24 @@
         padding: 8px; 
         margin-top: 4px; 
         box-sizing: border-box; 
-        appearance: textfield;           /* Standard property */
-        -webkit-appearance: none;        /* Chrome, Safari, Edge */
-        -moz-appearance: textfield;      /* Firefox */
+        appearance: textfield;
+        -webkit-appearance: none;
+        -moz-appearance: textfield;
     }
     button { margin-top: 20px; width: 100%; padding: 10px; background: #3498db; color: #fff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
-    .result { margin-top: 24px; padding: 12px; background: #eaf6ff; border-radius: 4px; text-align: center; }
-
+    .result { margin-top: 24px; padding: 12px; background: #eaf6ff; border-radius: 4px; text-align: center; word-break: break-word; }
     input[type=number]::-webkit-inner-spin-button, 
     input[type=number]::-webkit-outer-spin-button { 
         -webkit-appearance: none; 
         margin: 0; 
+    }
+    .flex-wrap { display: flex; gap: 24px; flex-wrap: wrap; }
+    .inputs-col { flex: 1 1 220px; min-width: 220px; }
+    .checkboxes-col { flex: 1 1 180px; min-width: 180px; margin-top:8px; }
+    @media (max-width: 700px) {
+        .container { max-width: 98vw; margin: 8px; padding: 8px; }
+        .flex-wrap { flex-direction: column; gap: 0; }
+        .checkboxes-col { margin-top: 24px; }
     }
     </style>
 </head>
@@ -31,9 +39,9 @@
     <div class="container">
     <h2>Total Bond Calculator</h2>
     <form id="bondForm">
-        <div style="display:flex; gap:32px;">
+        <div class="flex-wrap">
             <!-- Inputs Column -->
-            <div style="flex:1;">
+            <div class="inputs-col">
                 <label for="max_ap">
                     Max AP:
                     <span style="cursor:pointer; position:relative;">
@@ -89,7 +97,7 @@
                                 line-height:16px;
                                 margin-left:4px;
                             "
-                            title="Bond Points per Run is the total bond points you get per quest clear, excluding bonuses."
+                            title="Bond Points per Run is the total bond points you get per quest clear, including all bonuses."
                         >i</span>
                     </span>
                 </label>
@@ -99,7 +107,7 @@
                 <input type="number" id="cost" required min="1" value="1">
             </div>
             <!-- Checkboxes Column -->
-            <div style="flex:0 0 220px; margin-top:8px;">
+            <div class="checkboxes-col">
                 <label><input type="checkbox" id="teatime_support"> Chaldea Teatime (Support)</label><br>
                 <label><input type="checkbox" id="teatime_own"> Chaldea Teatime (Own)</label><br>
                 <label><input type="checkbox" id="lunchtime_support"> Chaldea Lunchtime (Support)</label><br>
