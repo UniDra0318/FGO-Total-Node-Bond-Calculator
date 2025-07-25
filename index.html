@@ -113,7 +113,8 @@
                 <label><input type="checkbox" id="lunchtime_support"> Chaldea Lunchtime (Support)</label><br>
                 <label><input type="checkbox" id="lunchtime_own"> Chaldea Lunchtime (Own)</label><br>
                 <label><input type="checkbox" id="bond_ce"> 5% Bond CE</label><br>
-                <label><input type="checkbox" id="support_front"> Frontline Support (4%)</label>
+                <label><input type="checkbox" id="support_front"> Frontline Support (4%)</label><br>
+                <label><input type="checkbox" id="fsn_ce"> 10% Bond FSN Servants CE</label>
                 <div id="bondBonusText" style="margin-top:24px; font-weight:bold; font-size:1.4em; text-align:center;"></div>
                 <div style="margin-top:32px; text-align:center;">
                     <button type="button" id="toggleMode" style="padding:8px 24px; border-radius:6px; border:none; background:#eee; color:#222; font-size:1em; cursor:pointer;">
@@ -140,16 +141,19 @@
     document.getElementById('lunchtime_own').addEventListener('change', updateBondBonus);
     document.getElementById('bond_ce').addEventListener('change', updateBondBonus);
     document.getElementById('support_front').addEventListener('change', updateBondBonus);
+    document.getElementById('fsn_ce').addEventListener('change', updateBondBonus);
 
     function updateBondBonus() {
-        const values = [15, 5, 10, 10, 5, 4];
+        // Updated values and ids to include FSN CE
+        const values = [15, 5, 10, 10, 5, 4, 10];
         const ids = [
             'teatime_support',
             'teatime_own',
             'lunchtime_support',
             'lunchtime_own',
             'bond_ce',
-            'support_front'
+            'support_front',
+            'fsn_ce'
         ];
         let total = 0;
         ids.forEach((id, i) => {
@@ -179,14 +183,16 @@
         const stage_bond = Number(document.getElementById('stage_bond').value);
         const cost = Number(document.getElementById('cost').value);
 
-        const values = [15, 5, 10, 10, 5, 4];
+        // Updated values and ids to include FSN CE
+        const values = [15, 5, 10, 10, 5, 4, 10];
         const ids = [
             'teatime_support',
             'teatime_own',
             'lunchtime_support',
             'lunchtime_own',
             'bond_ce',
-            'support_front'
+            'support_front',
+            'fsn_ce'
         ];
         let totalBonus = 0;
         ids.forEach((id, i) => {
